@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class UserRepository {
 
@@ -17,12 +18,23 @@ public class UserRepository {
         }
     }
 
-    public User getUserByUsername(String username) {
+    public User getUserById(UUID id) {
         for (User user : users) {
-            if (user.getName() == username) {
+            if (user.getId() == id) {
                 return user;
             }
         }
+        System.out.println("User does not exist");
+        return null;
+    }
+
+    public User getUserByUsername(String username) {
+        for (User user : users) {
+            if (user.getName().equals(username)) {
+                return user;
+            }
+        }
+        System.out.println("Username does not exist");
         return null;
     }
 
@@ -35,23 +47,23 @@ public class UserRepository {
         }
     }
 
-    public void removeUser(User user) {
-        if (users.contains(user)) {
+    public void removeUserById(UUID id) {
+        User user = getUserById(id);
+        if (isUnique(user)) {
             users.remove(user);
         } else {
-            System.out.println("User is not existent in repository.");
+            System.out.println("Could not remove user");
         }
     }
 
-    public boolean isUnique(User newUser) {
+    private boolean isUnique(User newUser) {
         boolean isUnique = true;
-        for (User user : users) {
-            if (user.getName().equals(newUser.getName())) {
+        for (User u : users) {
+            if (u.getName().equals(newUser.getName())) {
                 isUnique = false;
                 break;
             }
         }
         return isUnique;
     }
-
 }

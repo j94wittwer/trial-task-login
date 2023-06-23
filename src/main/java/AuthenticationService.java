@@ -1,3 +1,6 @@
+import java.util.Optional;
+import java.util.UUID;
+
 public class AuthenticationService {
 
     private UserRepository userRepository;
@@ -7,35 +10,42 @@ public class AuthenticationService {
     }
 
     public User createUser(String username, String password) {
-        return new User(username, password);
+        UUID id = UUID.randomUUID();
+        return new User(id, username, password);
     }
 
-    public void changeUsername(String currentUsername, String newUsername) {
+    public User changeUsername(String currentUsername, String newUsername) {
         if (newUsername == null || newUsername.isEmpty() || newUsername.trim().isEmpty()) {
             System.out.println("Please provide valid Username");
+            return null;
         } else {
             User oldUser = userRepository.getUserByUsername(currentUsername);
-            User updatedUser = new User(newUsername, oldUser.getPassword());
+            User updatedUser = new User(oldUser.getId(), newUsername, oldUser.getPassword());
             userRepository.updateUser(oldUser, updatedUser);
+            return updatedUser;
         }
     }
 
-    public void changePassword(String username, String oldPassword, String newPassword) {
-        User oldUser = userRepository.getUserByUsername(username);
+    public User changePassword(UUID id, String oldPassword, String newPassword) {
+        User oldUser = userRepository.getUserById(id);
 
-        if (authenticate(oldPassword, username)) {
-            User newUser = new User(username, newPassword);
-            userRepository.updateUser(oldUser, newUser);
+        if (authenticate(oldPassword, oldUser.getName())) {
+            User updatedUser = new User(oldUser.getId(), oldUser.getName(), newPassword);
+            userRepository.updateUser(oldUser, updatedUser);
             System.out.println("Password changed successfully");
+            return updatedUser;
         } else {
-            System.out.println("Old password incorrect");
+            System.out.println("Username or password incorrect");
+            return null;
         }
     }
 
     public boolean authenticate(String password, String username) {
         User user = userRepository.getUserByUsername(username);
-        return user.getPassword() == password && user.getName() == username;
+        return user.getPassword().equals(password) && user.getName().equals(username);
     }
 
-
+    public void deleteUser(UUID id) {
+        userRepository.removeUserById(id);
+    }
 }
