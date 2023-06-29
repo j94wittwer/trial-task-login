@@ -20,7 +20,7 @@ public class AuthenticationController {
     }
 
     public boolean signInUser(String username, String password) {
-        return authenticationService.authenticate(username, password);
+        return authenticationService.signInUser(username, password);
     }
 
     public User changePassword(UUID id, String oldPassword, String newPassword) {
