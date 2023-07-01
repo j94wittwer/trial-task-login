@@ -65,6 +65,6 @@ public class UserRepository {
                 break;
             }
         }
-        return isUnique;
+        return true;
     }
 }
