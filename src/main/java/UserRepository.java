@@ -21,7 +21,7 @@ public class UserRepository {
         if (isUnique(user)) {
             users.add(user);
         } else {
-            System.out.println("User is already in repository.");
+            throw new RuntimeException("User is already in repository.");
         }
     }
 
@@ -31,8 +31,7 @@ public class UserRepository {
                 return user;
             }
         }
-        System.out.println("User does not exist");
-        return null;
+        throw new RuntimeException("User does not exist");
     }
 
     public User getUserByUsername(String username) {
@@ -41,8 +40,7 @@ public class UserRepository {
                 return user;
             }
         }
-        System.out.println("Username does not exist");
-        return null;
+        throw new RuntimeException("User with username does not exist");
     }
 
     public void updateUser(User oldUser, User updatedUser) {
@@ -50,17 +48,13 @@ public class UserRepository {
             int index = users.indexOf(oldUser);
             users.set(index, updatedUser);
         } else {
-            System.out.println("Username already exists");
+            throw new RuntimeException("Username already exists");
         }
     }
 
     public void removeUserById(UUID id) {
         User user = getUserById(id);
-        if (isUnique(user)) {
-            users.remove(user);
-        } else {
-            System.out.println("Could not remove user");
-        }
+        users.remove(user);
     }
 
     private boolean isUnique(User newUser) {

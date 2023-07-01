@@ -22,8 +22,7 @@ public class AuthenticationService {
 
     public User changeUsername(String currentUsername, String newUsername) {
         if (newUsername == null || newUsername.isEmpty() || newUsername.trim().isEmpty()) {
-            System.out.println("Please provide valid Username");
-            return null;
+            throw new RuntimeException("Please provide a valid username");
         } else {
             User oldUser = userRepository.getUserByUsername(currentUsername);
             User updatedUser = new User(oldUser.getId(), newUsername, oldUser.getPassword());
@@ -35,18 +34,17 @@ public class AuthenticationService {
     public User changePassword(UUID id, String oldPassword, String newPassword) {
         User oldUser = userRepository.getUserById(id);
 
-        if (authenticate(oldPassword, oldUser.getName())) {
+        if (signInUser(oldPassword, oldUser.getName())) {
             User updatedUser = new User(oldUser.getId(), oldUser.getName(), newPassword);
             userRepository.updateUser(oldUser, updatedUser);
             System.out.println("Password changed successfully");
             return updatedUser;
         } else {
-            System.out.println("Username or password incorrect");
-            return null;
+            throw new RuntimeException("Username or password incorrect");
         }
     }
 
-    public boolean authenticate(String password, String username) {
+    public boolean signInUser(String password, String username) {
         User user = userRepository.getUserByUsername(username);
         return user.getPassword().equals(password) && user.getName().equals(username);
     }
