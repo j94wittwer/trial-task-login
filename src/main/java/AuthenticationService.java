@@ -20,11 +20,11 @@ public class AuthenticationService {
         return new User(id, username, password);
     }
 
-    public User changeUsername(String currentUsername, String newUsername) {
+    public User changeUsername(UUID id, String newUsername) {
         if (newUsername == null || newUsername.isEmpty() || newUsername.trim().isEmpty()) {
             throw new RuntimeException("Please provide a valid username");
         } else {
-            User oldUser = userRepository.getUserByUsername(currentUsername);
+            User oldUser = userRepository.getUserById(id);
             User updatedUser = new User(oldUser.getId(), newUsername, oldUser.getPassword());
             userRepository.updateUser(oldUser, updatedUser);
             return updatedUser;
@@ -34,22 +34,31 @@ public class AuthenticationService {
     public User changePassword(UUID id, String oldPassword, String newPassword) {
         User oldUser = userRepository.getUserById(id);
 
-        if (signInUser(oldPassword, oldUser.getName())) {
+        if (id == signInUser(oldPassword, oldUser.getName())) {
             User updatedUser = new User(oldUser.getId(), oldUser.getName(), newPassword);
             userRepository.updateUser(oldUser, updatedUser);
             System.out.println("Password changed successfully");
             return updatedUser;
         } else {
+            throw new RuntimeException("Failed to authenticate user");
+        }
+    }
+
+    public UUID signInUser(String password, String username) {
+        User user = userRepository.getUserByUsername(username);
+        if (user.getPassword().equals(password) && user.getName().equals(username)) {
+            return user.getId();
+        } else {
             throw new RuntimeException("Username or password incorrect");
         }
     }
 
-    public boolean signInUser(String password, String username) {
-        User user = userRepository.getUserByUsername(username);
-        return user.getPassword().equals(password) && user.getName().equals(username);
-    }
-
-    public void deleteUser(UUID id) {
-        userRepository.removeUserById(id);
+    public String deleteUser(UUID id) {
+        try {
+            userRepository.removeUserById(id);
+            return "User removed successfully";
+        } catch (Exception e) {
+            return "User could not be removed";
+        }
     }
 }

@@ -31,7 +31,7 @@ public class UserRepository {
                 return user;
             }
         }
-        throw new RuntimeException("User does not exist");
+        throw new RuntimeException("User with this ID does not exist");
     }
 
     public User getUserByUsername(String username) {
